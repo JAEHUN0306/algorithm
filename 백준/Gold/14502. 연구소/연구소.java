@@ -9,11 +9,12 @@ public class Main {
     static int safeArea = 0;
 
     public static void main(String[] args) {
-        Main T = new Main();
         Scanner sc = new Scanner(System.in);
         n = sc.nextInt();
         m = sc.nextInt();
+
         board = new int[n][m];
+        tempBoard = new int[n][m];
 
         for (int i = 0; i < n; i++) {
             for (int j = 0; j < m; j++) {
@@ -21,13 +22,12 @@ public class Main {
             }
         }
 
-        T.buildWall(0);
+        buildWall(0);
         System.out.println(safeArea);
     }
 
-    public void buildWall(int L) {
+    static void buildWall(int L) {
         if(L == 3) {
-            tempBoard = new int[n][m];
             for (int i = 0; i < n; i++) {
                 for (int j = 0; j < m; j++) {
                     tempBoard[i][j] = board[i][j];
@@ -36,14 +36,14 @@ public class Main {
 
             for (int i = 0; i < n; i++) {
                 for (int j = 0; j < m; j++) {
-                    if(tempBoard[i][j] == 2) {
+                    if(tempBoard[i][j] == 2)
                         virusDFS(i, j);
-                    }
                 }
             }
-            countSafeArea();
-            return;
-        } else {
+
+            safeArea = Math.max(getArea(), safeArea);
+
+        } else { // 벽이 새워지지 않았으면
             for (int i = 0; i < n; i++) {
                 for (int j = 0; j < m; j++) {
                     if(board[i][j] == 0) {
@@ -56,12 +56,10 @@ public class Main {
         }
     }
 
-
-    public void virusDFS(int x, int y) {
+    static void virusDFS(int x, int y) {
         for (int i = 0; i < 4; i++) {
             int nx = x + dx[i];
             int ny = y + dy[i];
-
             if(nx >= 0 && nx < n && ny >= 0 && ny < m && tempBoard[nx][ny] == 0) {
                 tempBoard[nx][ny] = 2;
                 virusDFS(nx, ny);
@@ -69,16 +67,14 @@ public class Main {
         }
     }
 
-    public void countSafeArea() {
-        int area = 0;
+    static int getArea() {
+        int count = 0;
         for (int i = 0; i < n; i++) {
             for (int j = 0; j < m; j++) {
-                if (tempBoard[i][j] == 0) {
-                    area++;
-                }
+                if(tempBoard[i][j] == 0) count++;
             }
         }
 
-        safeArea = Math.max(safeArea, area);
+        return count;
     }
 }
