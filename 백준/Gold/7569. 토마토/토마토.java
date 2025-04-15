@@ -1,94 +1,90 @@
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.LinkedList;
 import java.util.Queue;
-import java.util.Scanner;
+import java.util.StringTokenizer;
 
 public class Main {
-    static int[][][] board;
+    static int n, m, h;
+    static int[][][] tomatoes;
     static int[] dx = {-1, 1, 0, 0, 0, 0};
     static int[] dy = {0, 0, -1, 1, 0, 0};
     static int[] dz = {0, 0, 0, 0, -1, 1};
-    static int m, n, h; // 가로, 세로, 높이
-    public static void main(String[] args) {
-        Scanner sc = new Scanner(System.in);
-        m = sc.nextInt();
-        n = sc.nextInt();
-        h = sc.nextInt();
 
-        board = new int[n][m][h];
+    public static void main(String[] args) throws IOException {
+        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+        StringTokenizer st = new StringTokenizer(br.readLine());
+        m = Integer.parseInt(st.nextToken());
+        n = Integer.parseInt(st.nextToken());
+        h = Integer.parseInt(st.nextToken());
 
-        for (int k= 0; k < h; k++) {
-            for (int i = 0; i < n; i++) {
-                for (int j = 0; j < m; j++) {
-                    board[i][j][k] = sc.nextInt();
-                }
-            }
-        }
-
-        System.out.println(BFS());
-    }
-
-    public static int BFS() {
+        tomatoes = new int[h][n][m];
         Queue<Point> Q = new LinkedList<>();
 
-        for (int i = 0; i < n; i++) {
-            for (int j = 0; j < m; j++) {
-                for (int k = 0; k < h; k++) {
-                    if(board[i][j][k] == 1) {
-                        Q.offer(new Point(i, j, k));
-                    }
+        boolean already = true;
+        for (int i = 0; i < h; i++) {
+            for (int j = 0; j < n; j++) {
+                st = new StringTokenizer(br.readLine());
+                for (int k = 0; k < m; k++) {
+                    tomatoes[i][j][k] = Integer.parseInt(st.nextToken());
+                    if(tomatoes[i][j][k] == 1) Q.add(new Point(i, j, k));
+                    if(tomatoes[i][j][k] == 0) already = false;
                 }
             }
         }
 
-        int days = -1;
+        if(already) {
+            System.out.println(0);
+            return;
+        }
 
+        BFS(Q);
+
+        int maxDays = 0;
+        for (int i = 0; i < h; i++) {
+            for (int j = 0; j < n; j++) {
+                for (int k = 0; k < m; k++) {
+                    if (tomatoes[i][j][k] == 0) {
+                        System.out.println(-1);
+                        return;
+                    }
+                    if (tomatoes[i][j][k] != -1) {
+                        maxDays = Math.max(maxDays, tomatoes[i][j][k]);
+                    }
+                }
+            }
+        }
+        System.out.println(maxDays - 1);
+    }
+
+    public static void BFS(Queue<Point> Q) {
         while(!Q.isEmpty()) {
             int len = Q.size();
-            days++;
-
             for (int i = 0; i < len; i++) {
                 Point cur = Q.poll();
-
                 for (int j = 0; j < 6; j++) {
-                    int nx = cur.x + dx[j];
-                    int ny = cur.y + dy[j];
                     int nz = cur.z + dz[j];
+                    int ny = cur.y + dy[j];
+                    int nx = cur.x + dx[j];
 
-                    if(nx >= 0 && ny >= 0 && nz >= 0 && nx < n && ny < m && nz < h && board[nx][ny][nz] == 0) {
-                        board[nx][ny][nz] = 1;
-                        Q.offer(new Point(nx, ny, nz));
+                    if(nz >= 0 && ny >= 0 && nx >= 0 && nz < h && ny < n && nx < m && tomatoes[nz][ny][nx] == 0) {
+                        tomatoes[nz][ny][nx] = tomatoes[cur.z][cur.y][cur.x] + 1;
+                        Q.offer(new Point(nz, ny, nx));
                     }
                 }
             }
         }
-
-        if(!allRipe()) {
-            return -1;
-        }
-
-        return days;
     }
-    
-    public static boolean allRipe() {
-        for (int i = 0; i < n; i++) {
-            for (int j = 0; j < m; j++) {
-                for (int k = 0; k < h; k++) {
-                    if(board[i][j][k] == 0) return false;
-                }
-            }
-        }
-        return true;
-    }
+
 
     public static class Point {
-        int x;
-        int y;
-        int z;
+        int z, y, x;
 
-        public Point(int x, int y, int z) {
-            this.x = x;
-            this.y = y;
+        public Point(int z, int y, int x) {
             this.z = z;
+            this.y = y;
+            this.x = x;
         }
     }
 }
