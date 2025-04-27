@@ -1,4 +1,3 @@
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Scanner;
 import java.util.Set;
@@ -38,12 +37,12 @@ public class Main {
         if(gram > 0) {
             set.add(gram);
         }
-        if(L == n || memo[L][gram] == 1) { // 조합 완성 됐으면,
+        if(L == n || memo[L][gram] == 1) { // 이미 계산 했거나 조합이 완성된 경우 종료
             return;
         } else {
             memo[L][gram] = 1;
-            DFS(L + 1, grams[L] + gram);
-            DFS(L + 1, Math.abs(grams[L] - gram));
+            DFS(L + 1, gram + grams[L]);
+            DFS(L + 1, Math.abs(gram - grams[L]));
             DFS(L + 1, gram);
         }
     }
